@@ -1,7 +1,8 @@
 package co.restifo.chess;
 
-import co.restifo.chess.panels.CheckboardPanel;
-import co.restifo.chess.panels.PiecePanel;
+import co.restifo.chess.gui.BasePanel;
+import co.restifo.chess.gui.CheckboardPanel;
+import co.restifo.chess.gui.PiecePanel;
 
 import javax.swing.*;
 import java.awt.*;

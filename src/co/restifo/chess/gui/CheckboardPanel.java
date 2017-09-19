@@ -1,6 +1,4 @@
-package co.restifo.chess.panels;
-
-import co.restifo.chess.BasePanel;
+package co.restifo.chess.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;

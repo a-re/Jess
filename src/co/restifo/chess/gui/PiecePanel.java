@@ -1,7 +1,6 @@
-package co.restifo.chess.panels;
+package co.restifo.chess.gui;
 
-import co.restifo.chess.BasePanel;
-import co.restifo.chess.Board;
+import co.restifo.chess.engine.Board;
 
 import javax.imageio.ImageIO;
 import java.awt.BasicStroke;
@@ -33,9 +32,12 @@ public class PiecePanel extends BasePanel {
     private final int mRectHeight = BasePanel.getRectHeight(), mRectWidth = BasePanel.getRectWidth();
     private Map<int[], BufferedImage> mPieceImages;
     private List<Rectangle> mRectsToDraw;
-
+    private Board board; // The main game board, this variable might change location later
 
     public PiecePanel() {
+        // Initialize our game board
+        board = new Board();
+
         // Read all of our piece images in
         mPieceImages = new HashMap<>();
         mRectsToDraw = new ArrayList<>();
@@ -73,22 +75,23 @@ public class PiecePanel extends BasePanel {
     public void paintComponent(Graphics g) {
         //System.out.println("paintComponent() in PiecePanel called");
         Graphics2D gr = (Graphics2D) g;
-        Board b = this.getBoard();
 
-        b.switchSide(0); // This makes sure we draw white pieces first (is this necessary?)
-        mPieceImages.put(getBitIdxs(b.getRooks()), mWR);
-        mPieceImages.put(getBitIdxs(b.getKnights()), mWN);
-        mPieceImages.put(getBitIdxs(b.getBishops()), mWB);
-        mPieceImages.put(getBitIdxs(b.getQueens()), mWQ);
-        mPieceImages.put(getBitIdxs(b.getKings()), mWK);
-        mPieceImages.put(getBitIdxs(b.getPawns()), mWP);
-        b.switchSide(1); // Now switch to black pieces
-        mPieceImages.put(getBitIdxs(b.getRooks()), mBR);
-        mPieceImages.put(getBitIdxs(b.getKnights()), mBN);
-        mPieceImages.put(getBitIdxs(b.getBishops()), mBB);
-        mPieceImages.put(getBitIdxs(b.getQueens()), mBQ);
-        mPieceImages.put(getBitIdxs(b.getKings()), mBK);
-        mPieceImages.put(getBitIdxs(b.getPawns()), mBP);
+        int oldSide = board.getSide();
+        board.switchSide(0); // This makes sure we draw white pieces first (is this necessary?)
+        mPieceImages.put(getBitIdxs(board.getRooks()), mWR);
+        mPieceImages.put(getBitIdxs(board.getKnights()), mWN);
+        mPieceImages.put(getBitIdxs(board.getBishops()), mWB);
+        mPieceImages.put(getBitIdxs(board.getQueens()), mWQ);
+        mPieceImages.put(getBitIdxs(board.getKings()), mWK);
+        mPieceImages.put(getBitIdxs(board.getPawns()), mWP);
+        board.switchSide(1); // Now switch to black pieces
+        mPieceImages.put(getBitIdxs(board.getRooks()), mBR);
+        mPieceImages.put(getBitIdxs(board.getKnights()), mBN);
+        mPieceImages.put(getBitIdxs(board.getBishops()), mBB);
+        mPieceImages.put(getBitIdxs(board.getQueens()), mBQ);
+        mPieceImages.put(getBitIdxs(board.getKings()), mBK);
+        mPieceImages.put(getBitIdxs(board.getPawns()), mBP);
+        board.switchSide(oldSide); // restore the old side
 
         // Draw the pieces
         Iterator it = mPieceImages.entrySet().iterator();
