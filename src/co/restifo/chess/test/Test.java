@@ -34,13 +34,33 @@ public class Test {
     private long[][] mRookMagicMoves = new long[64][];
     private long[][] mBishopMagicMoves = new long[64][];
 
-
-    // Magic numbers
-//    private long[] mRookMagics = {0x4080011024400080L, 0xa40042000300040L, 0x2080100048806000L, 0x80100008000c82L, 0x600020020284510L, 0x1700088a14000100L, 0x400009102040850L, 0x200002280c20401L, 0x8000801120804004L, 0x8440100a406000L, 0x1204801000200080L, 0x26000840220030L, 0x2012001200200408L, 0xa011000400030008L, 0x801000300020004L, 0x4082000a00409104L, 0x4180084000402000L, 0x10004004c02000L, 0x431130060010040L, 0x7110818030000801L, 0x1081010004080011L, 0x4008002004480L, 0x4090c0005508208L, 0x9410200004d0584L, 0x45188a380004000L, 0x20100040002040L, 0xc500430900102000L, 0x2120100100082104L, 0x4003841100180100L, 0x201000300040008L, 0x4000011400021008L, 0x200018a00140041L, 0x240028020800140L, 0x1010402004401000L, 0x801000802001L, 0xc0180080801000L, 0x2124240080803801L, 0x1002000400800280L, 0x22000182000804L, 0x8804204a000089L, 0x608844010208000L, 0x390104020004000L, 0x908820030620040L, 0x19001000250008L, 0x8008000400088080L, 0x41401020080104L, 0x80061008040001L, 0xb2208400420001L, 0x210442008200L, 0x1410a104080a200L, 0x450014600100L, 0x8081804800100280L, 0x300402081001002L, 0x2404c0022008080L, 0x821098350400L, 0x80800100004080L, 0xa000201100884202L, 0x10802040090011L, 0x40020210400a8022L, 0x24050020087001L, 0x108a002420981102L, 0x41000400020881L, 0x20088101114L, 0x840241022aL};
-//    private long[] mBishopMagics = {0x4818100108250030L, 0x9914014805190700L, 0x228009102040108L, 0x210c041880040422L, 0x244104440080024L, 0xa0882080c0011L, 0x8401009220202c00L, 0x9000490803900c08L, 0x200410524040L, 0x1500020288010100L, 0x4a00100100410000L, 0xd000111042000000L, 0x8400040420104008L, 0x20001182a0200001L, 0x4000604108084004L, 0x2810c09010844L, 0x41800528060400L, 0x8082041040191L, 0x10000245020321L, 0x8014114110001L, 0x882100403200800L, 0x800410108800L, 0x48400094c460808L, 0xe044501050104L, 0x404104084303004L, 0x2081090612845L, 0x800820010040031L, 0x80900400004010e0L, 0x815010000104004L, 0x470082048200L, 0x200800200d000L, 0x201d083000440400L, 0x4890030800200820L, 0x4124100880024a41L, 0x8024002800040040L, 0x50200800110810L, 0x85100082202a0200L, 0x1010011060804aL, 0x9044810440240400L, 0x3400840090450482L, 0x1480884204028L, 0x1004a082010a480L, 0xc2084410081200L, 0x8010c02058000102L, 0x400080100411400L, 0x6801811001020280L, 0x4884081000400L, 0x22100082008a2041L, 0x8081016802400080L, 0x40104008c048800L, 0x401046b100082L, 0x1084050020880000L, 0x5002124405040802L, 0x804002240110c3L, 0x81a20802128c0418L, 0x68810210220a040L, 0xd8a024048045000L, 0x220042084440L, 0x140200840400L, 0x8400100011058801L, 0x9000045208e00L, 0x2113084008450309L, 0x10a81041880100L, 0x400802580d470a00L};
-    private long[] mRookMagics = new long[64];
-    private long[] mBishopMagics = new long[64];
-
+    // Magic numbers (generated with generateMagic() function)
+    private long[] mRookMagics = {0x4080011024400080L, 0xa40042000300040L, 0x2080100048806000L, 0x80100008000c82L,
+            0x600020020284510L, 0x1700088a14000100L, 0x400009102040850L, 0x200002280c20401L, 0x8000801120804004L,
+            0x8440100a406000L, 0x1204801000200080L, 0x26000840220030L, 0x2012001200200408L, 0xa011000400030008L,
+            0x801000300020004L, 0x4082000a00409104L, 0x4180084000402000L, 0x10004004c02000L, 0x431130060010040L,
+            0x7110818030000801L, 0x1081010004080011L, 0x4008002004480L, 0x4090c0005508208L, 0x9410200004d0584L,
+            0x45188a380004000L, 0x20100040002040L, 0xc500430900102000L, 0x2120100100082104L, 0x4003841100180100L,
+            0x201000300040008L, 0x4000011400021008L, 0x200018a00140041L, 0x240028020800140L, 0x1010402004401000L,
+            0x801000802001L, 0xc0180080801000L, 0x2124240080803801L, 0x1002000400800280L, 0x22000182000804L,
+            0x8804204a000089L, 0x608844010208000L, 0x390104020004000L, 0x908820030620040L, 0x19001000250008L,
+            0x8008000400088080L, 0x41401020080104L, 0x80061008040001L, 0xb2208400420001L, 0x210442008200L,
+            0x1410a104080a200L, 0x450014600100L, 0x8081804800100280L, 0x300402081001002L, 0x2404c0022008080L,
+            0x821098350400L, 0x80800100004080L, 0xa000201100884202L, 0x10802040090011L, 0x40020210400a8022L,
+            0x24050020087001L, 0x108a002420981102L, 0x41000400020881L, 0x20088101114L, 0x840241022aL};
+    private long[] mBishopMagics = {0x4818100108250030L, 0x9914014805190700L, 0x228009102040108L, 0x210c041880040422L,
+            0x244104440080024L, 0xa0882080c0011L, 0x8401009220202c00L, 0x9000490803900c08L, 0x200410524040L,
+            0x1500020288010100L, 0x4a00100100410000L, 0xd000111042000000L, 0x8400040420104008L, 0x20001182a0200001L,
+            0x4000604108084004L, 0x2810c09010844L, 0x41800528060400L, 0x8082041040191L, 0x10000245020321L,
+            0x8014114110001L, 0x882100403200800L, 0x800410108800L, 0x48400094c460808L, 0xe044501050104L,
+            0x404104084303004L, 0x2081090612845L, 0x800820010040031L, 0x80900400004010e0L, 0x815010000104004L,
+            0x470082048200L, 0x200800200d000L, 0x201d083000440400L, 0x4890030800200820L, 0x4124100880024a41L,
+            0x8024002800040040L, 0x50200800110810L, 0x85100082202a0200L, 0x1010011060804aL, 0x9044810440240400L,
+            0x3400840090450482L, 0x1480884204028L, 0x1004a082010a480L, 0xc2084410081200L, 0x8010c02058000102L,
+            0x400080100411400L, 0x6801811001020280L, 0x4884081000400L, 0x22100082008a2041L, 0x8081016802400080L,
+            0x40104008c048800L, 0x401046b100082L, 0x1084050020880000L, 0x5002124405040802L, 0x804002240110c3L,
+            0x81a20802128c0418L, 0x68810210220a040L, 0xd8a024048045000L, 0x220042084440L, 0x140200840400L,
+            0x8400100011058801L, 0x9000045208e00L, 0x2113084008450309L, 0x10a81041880100L, 0x400802580d470a00L};
 
     private boolean mTestDirectionality = false;
     private boolean mTestRookOccupancyMasksInitialization = false;
@@ -54,8 +74,8 @@ public class Test {
     private boolean mTestRookBlockerAndMoveBoardInitialization = false;
     private boolean mTestBishopBlockerAndMoveBoardInitialization = false;
 
-    private boolean mTestRookMagicsGeneration = true;
-    private boolean mTestBishopMagicsGeneration = false;
+    private boolean mTestRookMagicsGeneration = false;
+    private boolean mTestBishopMagicsGeneration = true;
 
     private final Direction[] mRookDirections = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
     private final Direction[] mBishopDirections = {Direction.NORTHEAST, Direction.SOUTHEAST, Direction.SOUTHWEST, Direction.NORTHWEST};
@@ -88,25 +108,25 @@ public class Test {
         generateRookBlockerAndMoveBoards();
         generateBishopBlockerAndMoveBoards();
 
-        long rms = System.currentTimeMillis();
-        mRookMagics = generateMagics(mRookBlockerBoards, mRookMoveBoards, mRookBitsSet);
+//        long rms = System.currentTimeMillis();
+//        mRookMagics = generateMagics(mRookBlockerBoards, mRookMoveBoards, mRookBitsSet);
 //        String rookString = "{";
 //        for (long l : mRookMagics) {
 //            rookString += "0x" + Long.toHexString(l) + "L, ";
 //        }
 //        rookString += "}";
 //        out.println(rookString);
-        out.printf("Rook magic init took %dms\n", System.currentTimeMillis() - rms);
+//        out.printf("Rook magic init took %dms\n", System.currentTimeMillis() - rms);
 
-        long bms = System.currentTimeMillis();
-        mBishopMagics = generateMagics(mBishopBlockerBoards, mBishopMoveBoards, mBishopBitsSet);
+//        long bms = System.currentTimeMillis();
+//        mBishopMagics = generateMagics(mBishopBlockerBoards, mBishopMoveBoards, mBishopBitsSet);
 //        String bishopString = "{";
 //        for (long l : mBishopMagics) {
 //            bishopString += "0x" + Long.toHexString(l) + "L, ";
 //        }
 //        bishopString += "}";
 //        out.println(bishopString);
-        out.printf("Bishop magic init took %dms\n", System.currentTimeMillis() - bms);
+//        out.printf("Bishop magic init took %dms\n", System.currentTimeMillis() - bms);
 
         generateRookMagicMoves();
         generateBishopMagicMoves();
@@ -193,8 +213,23 @@ public class Test {
                 long movebb = getRookMove(randomOccupancy, rookSq);
                 printBitboard(movebb, "R");
 
-//                out.printf("BLOCKER BOARD FOR ROOK @ SQ=%d :\n", rookSq);
-//                printBitboard(mRookBlockerBoards[rookSq][mRookBlockerBoards[rookSq].length - 1], "R");
+                out.println();
+                out.println();
+            }
+        }
+        if (mTestBishopMagicsGeneration) {
+            // subset a random sample of blocker boards to see if our magics work
+            for (int i = 0; i < 20; i++) {
+                int bishopSq = rand.nextInt(64);
+                long randomOccupancy = rand.nextLong() & rand.nextLong();
+                randomOccupancy |= 1L << bishopSq; // add our bishop
+
+                out.println("OCCUPANCY:");
+                printBitboard(randomOccupancy, "B");
+
+                out.printf("MOVE BOARD FOR BISHOP @ SQ=%d :\n", bishopSq);
+                long movebb = getBishopMove(randomOccupancy, bishopSq);
+                printBitboard(movebb, "B");
 
                 out.println();
                 out.println();
