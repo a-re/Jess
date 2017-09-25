@@ -1,4 +1,4 @@
-package co.restifo.chess;
+package co.restifo.chess.engine;
 
 import co.restifo.chess.gui.BasePanel;
 import co.restifo.chess.gui.CheckboardPanel;

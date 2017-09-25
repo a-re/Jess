@@ -1,6 +1,9 @@
 package co.restifo.chess.gui;
 
 import co.restifo.chess.engine.Board;
+import co.restifo.chess.engine.ChessGame;
+import co.restifo.chess.engine.NormalMove;
+import co.restifo.chess.engine.PieceType;
 
 import javax.imageio.ImageIO;
 import java.awt.BasicStroke;
@@ -30,17 +33,20 @@ public class PiecePanel extends BasePanel {
     private BufferedImage mBK, mWK;
 
     private final int mRectHeight = BasePanel.getRectHeight(), mRectWidth = BasePanel.getRectWidth();
-    private Map<int[], BufferedImage> mPieceImages;
-    private List<Rectangle> mRectsToDraw;
-    private Board board; // The main game board, this variable might change location later
+    private Map<List<Integer>, BufferedImage> mPieceImages;
+    private List<ColoredRectangle> mMoveRectangles;
+    private Rectangle mSelectionRectangle;
+    private int mSelectedSquare;
+    private ChessGame game; // The main game board, this variable might change location later
 
     public PiecePanel() {
-        // Initialize our game board
-        board = new Board();
+        // Set up our current game and the move rectangle array
+        game = new ChessGame("rnbq1rk1/ppp1b1pp/4pn2/5p2/2Pp4/5NP1/PP2PPBP/RNBQ1RK1 w - -");
+//        game = new ChessGame();
+        mMoveRectangles = new ArrayList<>();
 
         // Read all of our piece images in
         mPieceImages = new HashMap<>();
-        mRectsToDraw = new ArrayList<>();
         try {
             mBP = ImageIO.read(new File("res/bp.png"));
             mWP = ImageIO.read(new File("res/wp.png"));
@@ -64,10 +70,23 @@ public class PiecePanel extends BasePanel {
                 super.mouseReleased(e);
                 int col = e.getX() / mRectWidth;
                 int row = e.getY() / mRectHeight;
-                mRectsToDraw.add(new Rectangle(col * mRectWidth, row * mRectHeight, mRectWidth, mRectHeight));
+
+                mMoveRectangles.clear();
+                mSelectedSquare = row * 8 + col;
+                Board b = game.getBoard();
+                PieceType pieceOnSquare = b.getPieceOnSquare(mSelectedSquare);
+                System.out.println(pieceOnSquare);
+                for (NormalMove m : b.getPseudolegalMoves(b.getAllPieces(), b.getPieces(), mSelectedSquare, pieceOnSquare)) {
+                    Color pieceColor = Color.GREEN;
+                    int moveRow = m.getToSquare() / 8;
+                    int moveCol = m.getToSquare() % 8;
+                    mMoveRectangles.add(new ColoredRectangle(moveCol * mRectWidth + 1, moveRow * mRectHeight + 1, mRectWidth - 1, mRectHeight - 1, pieceColor));
+                }
+                mSelectionRectangle = new Rectangle(col * mRectWidth, row * mRectHeight, mRectWidth, mRectHeight);
                 repaint();
             }
         });
+
         this.repaint();
     }
 
@@ -75,22 +94,23 @@ public class PiecePanel extends BasePanel {
     public void paintComponent(Graphics g) {
         //System.out.println("paintComponent() in PiecePanel called");
         Graphics2D gr = (Graphics2D) g;
+        Board board = game.getBoard();
 
         int oldSide = board.getSide();
         board.switchSide(0); // This makes sure we draw white pieces first (is this necessary?)
-        mPieceImages.put(getBitIdxs(board.getRooks()), mWR);
-        mPieceImages.put(getBitIdxs(board.getKnights()), mWN);
-        mPieceImages.put(getBitIdxs(board.getBishops()), mWB);
-        mPieceImages.put(getBitIdxs(board.getQueens()), mWQ);
-        mPieceImages.put(getBitIdxs(board.getKings()), mWK);
-        mPieceImages.put(getBitIdxs(board.getPawns()), mWP);
+        mPieceImages.put(board.getBitIdxs(board.getRooks()), mWR);
+        mPieceImages.put(board.getBitIdxs(board.getKnights()), mWN);
+        mPieceImages.put(board.getBitIdxs(board.getBishops()), mWB);
+        mPieceImages.put(board.getBitIdxs(board.getQueens()), mWQ);
+        mPieceImages.put(board.getBitIdxs(board.getKings()), mWK);
+        mPieceImages.put(board.getBitIdxs(board.getPawns()), mWP);
         board.switchSide(1); // Now switch to black pieces
-        mPieceImages.put(getBitIdxs(board.getRooks()), mBR);
-        mPieceImages.put(getBitIdxs(board.getKnights()), mBN);
-        mPieceImages.put(getBitIdxs(board.getBishops()), mBB);
-        mPieceImages.put(getBitIdxs(board.getQueens()), mBQ);
-        mPieceImages.put(getBitIdxs(board.getKings()), mBK);
-        mPieceImages.put(getBitIdxs(board.getPawns()), mBP);
+        mPieceImages.put(board.getBitIdxs(board.getRooks()), mBR);
+        mPieceImages.put(board.getBitIdxs(board.getKnights()), mBN);
+        mPieceImages.put(board.getBitIdxs(board.getBishops()), mBB);
+        mPieceImages.put(board.getBitIdxs(board.getQueens()), mBQ);
+        mPieceImages.put(board.getBitIdxs(board.getKings()), mBK);
+        mPieceImages.put(board.getBitIdxs(board.getPawns()), mBP);
         board.switchSide(oldSide); // restore the old side
 
         // Draw the pieces
@@ -98,7 +118,7 @@ public class PiecePanel extends BasePanel {
         while (it.hasNext()) {
             Map.Entry entry = (Map.Entry) it.next();
             BufferedImage pieceImage = (BufferedImage) entry.getValue();
-            int[] piecePos = (int[]) entry.getKey();
+            List<Integer> piecePos = (List<Integer>) entry.getKey();
 
             for (int piece : piecePos) {
                 if (piece != -1) {
@@ -109,34 +129,37 @@ public class PiecePanel extends BasePanel {
             }
         }
 
-        // Draw the selection rectangles surrounding the pieces if we need to
-        if (mRectsToDraw.size() > 0) {
+        // Draw the selection rectangle surrounding the selected square if we need to
+        if (mSelectionRectangle != null) {
             Stroke oldStroke = gr.getStroke(); // First save our old stroke so it's not permanently thiccccc ;)
             gr.setStroke(new BasicStroke(2)); // Set the stroke to be thicker
             gr.setColor(Color.RED);
-            for (int i = 0; i < mRectsToDraw.size(); i++) {
-                Rectangle r = mRectsToDraw.remove(i);
-                gr.drawRect(r.x, r.y, r.width, r.height);
+            gr.drawRect(mSelectionRectangle.x, mSelectionRectangle.y, mSelectionRectangle.width, mSelectionRectangle.height);
+            gr.setStroke(oldStroke);
+            mSelectionRectangle = null;
+        }
+
+        if (mMoveRectangles.size() > 0) {
+            Stroke oldStroke = gr.getStroke(); // First save our old stroke so it's not permanently thiccccc ;)
+            gr.setStroke(new BasicStroke(2)); // Set the stroke to be thicker
+            for (ColoredRectangle moveRect : mMoveRectangles) {
+                gr.setColor(moveRect.color);
+                gr.drawRect(moveRect.x, moveRect.y, moveRect.width, moveRect.height);
             }
             gr.setStroke(oldStroke);
         }
     }
 
-    // TODO: This is really terrible, we don't need to check each bit
-    private int[] getBitIdxs(long bitboard) {
-        int[] ret = {-1, -1, -1, -1, -1, -1, -1, -1};
-        int count = 0;
-        for (int i = 0; bitboard != 0; i++) {
-            if ((bitboard & 1) == 1) {
-                ret[count] = i;
-                count++;
-            }
-            bitboard >>>= 1;
-        }
-        return ret;
-    }
-
     private int[] getRowCol(int index) {
         return new int[] {index / 8, index % 8};
+    }
+
+    // So we can specify the color of a rectangle with one class
+    class ColoredRectangle extends Rectangle {
+        Color color;
+        ColoredRectangle(int x, int y, int width, int height, Color color) {
+            super(x, y, width, height);
+            this.color = color;
+        }
     }
 }
