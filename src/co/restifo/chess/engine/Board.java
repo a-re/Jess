@@ -482,8 +482,8 @@ public class Board {
         for (int i : getBitIdxs(mQueens[0] | mQueens[1]))   mSquarePieces[i] = PieceType.QUEEN;
         for (int i : getBitIdxs(mKings[0] | mKings[1]))     mSquarePieces[i] = PieceType.KING;
         for (int i : getBitIdxs(mKnights[0] | mKnights[1])) mSquarePieces[i] = PieceType.KNIGHT;
-        for (int i : getBitIdxs(mPawns[0]))                          mSquarePieces[i] = PieceType.WHITE_PAWN;
-        for (int i : getBitIdxs(mPawns[1]))                          mSquarePieces[i] = PieceType.BLACK_PAWN;
+        for (int i : getBitIdxs(mPawns[0]))                 mSquarePieces[i] = PieceType.WHITE_PAWN;
+        for (int i : getBitIdxs(mPawns[1]))                 mSquarePieces[i] = PieceType.BLACK_PAWN;
     }
 
     //</editor-fold>
