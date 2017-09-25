@@ -210,29 +210,17 @@ public class Board {
     }
     //</editor-fold>
     //<editor-fold desc="Getters/setters">
-    public long getPawns() {
-        return mPawns[mSide];
-    }
+    public long getPawns() { return mPawns[mSide]; }
 
-    public long getRooks() {
-        return mRooks[mSide];
-    }
+    public long getRooks() { return mRooks[mSide]; }
 
-    public long getKnights() {
-        return mKnights[mSide];
-    }
+    public long getKnights() { return mKnights[mSide]; }
 
-    public long getBishops() {
-        return mBishops[mSide];
-    }
+    public long getBishops() { return mBishops[mSide]; }
 
-    public long getQueens() {
-        return mQueens[mSide];
-    }
+    public long getQueens() { return mQueens[mSide]; }
 
-    public long getKings() {
-        return mKings[mSide];
-    }
+    public long getKings() { return mKings[mSide]; }
 
     public long getPieces() { return mPieces[mSide]; }
 
@@ -385,43 +373,46 @@ public class Board {
     }
     //</editor-fold>
     //<editor-fold desc="Move generation">
-    public List<NormalMove> getLegalMoves() {
-        List<NormalMove> normalMoves = new ArrayList<>();
+    public List<Move> getLegalMoves() {
+        List<Move> moves = new ArrayList<>();
         int oppSide = mSide == 0 ? 1 : 0;
         long allPieces = mPieces[mSide] | mPieces[oppSide];
 
         // Step 1: First, generate all our pseudolegal moves, then check if they are legal in the next step
         // Get our rook moves
         List<Integer> rookIdxs = getBitIdxs(mRooks[mSide]);
-        for (int pieceSq : rookIdxs) if (pieceSq != -1) { normalMoves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.ROOK)); }
+        for (int pieceSq : rookIdxs) if (pieceSq != -1) { moves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.ROOK)); }
 
         // Bishop moves
         List<Integer> bishopIdxs = getBitIdxs(mBishops[mSide]);
-        for (int pieceSq : bishopIdxs) if (pieceSq != -1) { normalMoves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.BISHOP)); }
+        for (int pieceSq : bishopIdxs) if (pieceSq != -1) { moves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.BISHOP)); }
 
         // Knight moves
         List<Integer> knightIdxs = getBitIdxs(mKnights[mSide]);
-        for (int pieceSq : knightIdxs) if (pieceSq != -1) { normalMoves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.KNIGHT)); }
+        for (int pieceSq : knightIdxs) if (pieceSq != -1) { moves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.KNIGHT)); }
 
         // Queen moves
         List<Integer> queenIdxs = getBitIdxs(mQueens[mSide]);
-        for (int pieceSq : queenIdxs) if (pieceSq != -1) { normalMoves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.QUEEN)); }
+        for (int pieceSq : queenIdxs) if (pieceSq != -1) { moves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.QUEEN)); }
 
         // King moves
         List<Integer> kingIdxs = getBitIdxs(mKings[mSide]);
-        for (int pieceSq : kingIdxs) if (pieceSq != -1) { normalMoves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.KING)); }
+        for (int pieceSq : kingIdxs) if (pieceSq != -1) { moves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.KING)); }
 
         // Pawn moves
         List<Integer> pawnIdxs = getBitIdxs(mPawns[mSide]);
         PieceType pawnType = mSide == 0 ? PieceType.WHITE_PAWN : PieceType.BLACK_PAWN;
-        for (int pieceSq : pawnIdxs) if (pieceSq != -1) { normalMoves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, pawnType)); }
-
-//        // Black pawn normalMoves
-//        int[] bPawnIdxs = getBitIdxs(mPawns[1]);
-//        for (int pieceSq : bPawnIdxs) if (pieceSq != -1) { normalMoves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, PieceType.BLACK_PAWN)); }
+        for (int pieceSq : pawnIdxs) if (pieceSq != -1) { moves.addAll(getPseudolegalMoves(allPieces, mPieces[mSide], pieceSq, pawnType)); }
 
         // TODO: GENERATE CASTLING/EN PASSANT MOVES
-        return normalMoves;
+        if (mCanCastle[0][KINGSIDE_CASTLE])  moves.add(CastleMove.WHITE_KINGSIDE);
+        if (mCanCastle[0][QUEENSIDE_CASTLE]) moves.add(CastleMove.WHITE_QUEENSIDE);
+        if (mCanCastle[1][KINGSIDE_CASTLE])  moves.add(CastleMove.BLACK_KINGSIDE);
+        if (mCanCastle[1][QUEENSIDE_CASTLE]) moves.add(CastleMove.BLACK_QUEENSIDE);
+
+        // Step 2: See if any of our pseudolegal moves put our king in check
+        
+        return moves;
     }
 
     public List<NormalMove> getPseudolegalMoves(long occupancyAll, long occupancyFriendly, int square, PieceType pt) {
@@ -468,14 +459,47 @@ public class Board {
     //</editor-fold>
     //<editor-fold desc="Move making/unmaking">
     public void makeMove(NormalMove move) {
+        int oppSide = mSide == 0 ? 1 : 0;
+        int toSquare = move.getToSquare();
+        int fromSquare = move.getFromSquare();
+        long toSquareMask = 1L << toSquare;
+        long fromSquareMask = 1L << fromSquare;
 
+        boolean isMoveCapture = (toSquareMask & mPieces[oppSide]) != 0;
+
+        long[] pieceBB = mPawns;
+        PieceType movePieceType = move.getPieceType();
+        switch (movePieceType) {
+            case ROOK: pieceBB = mRooks; break;
+            case BISHOP: pieceBB = mBishops; break;
+            case QUEEN: pieceBB = mQueens; break;
+            case KING: pieceBB = mKings; break;
+            case KNIGHT: pieceBB = mKnights; break;
+        }
+        pieceBB[mSide] &= ~fromSquareMask;
+        pieceBB[mSide] |= toSquareMask;
+        mPieces[mSide] &= ~fromSquareMask;
+        mPieces[mSide] |= toSquareMask;
+
+        // If the move is a capture move, we also need to clear the enemy capture piece
+        if (isMoveCapture) {
+            pieceBB[oppSide] &= ~toSquareMask;
+            mPieces[oppSide] &= ~toSquareMask;
+        }
+
+        // Lastly, we need to update the piece-on-square array
+        mSquarePieces[fromSquare] = PieceType.EMPTY;
+        mSquarePieces[toSquare] = movePieceType;
     }
 
     public void makeMove(CastleMove move) {
-
+        makeMove(move.getKingMove());
+        makeMove(move.getRookMove());
     }
 
     // Update our array of what squares pieces occupy
+    // TODO: This function is kind of useless because we do all this in the makeMove() function
+    // TODO: Either refactor this to emphasize that this is called only once or inline it into the calling functions
     private void updateSquarePieces() {
         for (int i : getBitIdxs(mRooks[0] | mRooks[1]))     mSquarePieces[i] = PieceType.ROOK;
         for (int i : getBitIdxs(mBishops[0] | mBishops[1])) mSquarePieces[i] = PieceType.BISHOP;
